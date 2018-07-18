@@ -14,5 +14,13 @@ export default class Scene {
     this.scene.innerText = 'Browser not supported'
 
     this.root.appendChild(this.scene)
+
+    this.ctx = this.scene.getContext('2d')
+  }
+
+
+
+  clear() {
+    this.ctx.clearRect(0, 0, this.width, this.height);
   }
 }
