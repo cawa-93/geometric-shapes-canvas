@@ -4,8 +4,6 @@ export default class Scene {
     this.height = height
     this.root = root
 
-    console.log(this)
-
     this.scene = document.createElement('canvas')
 
     this.scene.width = this.width
