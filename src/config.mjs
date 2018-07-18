@@ -4,3 +4,5 @@ export default {
     height: 300
   }
 }
+
+export const SHOW_OUTLINES = true
