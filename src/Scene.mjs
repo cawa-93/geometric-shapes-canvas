@@ -1,5 +1,7 @@
+import Factory from "./Factory.mjs";
+
 export default class Scene {
-  constructor({ width, height, root}) {
+  constructor({ width, height, root, items}) {
     this.width = width
     this.height = height
     this.root = root
@@ -14,8 +16,24 @@ export default class Scene {
     this.root.appendChild(this.scene)
 
     this.ctx = this.scene.getContext('2d')
+
+    this.factory = new Factory(this)
+    if (Array.isArray(items) && items.length) {
+      items.forEach(item => this.factory.addItem(item))
+    }
+
+
   }
 
+  startAnimation () {
+    this.animationTick()
+  }
+  
+  animationTick() {
+    this.clear()
+    this.factory.items.forEach(item => item.move())
+    window.requestAnimationFrame(() => this.animationTick())
+  }
 
 
   clear() {
