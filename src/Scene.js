@@ -1,4 +1,4 @@
-import Factory from "./Factory.mjs";
+import Factory from "./Factory.js";
 
 export default class Scene {
   constructor({ width, height, root, items}) {
@@ -18,11 +18,10 @@ export default class Scene {
     this.ctx = this.scene.getContext('2d')
 
     this.factory = new Factory(this)
-    if (Array.isArray(items) && items.length) {
-      items.forEach(item => this.factory.addItem(item))
-    }
+  }
 
-
+  addItem(item) {
+    this.factory.addItem(item)
   }
 
   startAnimation () {

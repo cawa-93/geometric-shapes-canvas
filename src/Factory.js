@@ -1,6 +1,5 @@
-import Reactangle from './Rectangle.mjs';
-import Circle from './Circle.mjs';
-import Triangle from './Triangle.mjs';
+import Polygon from './Polygon.js';
+import Circle from './Circle.js';
 
 export default class Factory {
   constructor (scene) {
@@ -12,21 +11,17 @@ export default class Factory {
     let item = null
     params.scene = this.scene
     switch (params.type) {
-      case 'reactangle':
-        item = new Reactangle(params)
+      case 'polygon':
+        item = new Polygon(params)
         break
 
       case 'circle':
         item = new Circle(params)
         break
-
-      case 'triangle':
-        item = new Triangle(params)
-        break
     }
 
     if (item) {
-      item.render(params.x, params.y)
+      item.render()
       return this.items.push(item) - 1
     }
   }
