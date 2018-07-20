@@ -3,7 +3,6 @@ import Scene from './Scene.js';
 import Polygon from './Polygon.js';
 import Circle from './Circle.js';
 
-console.log(config)
 const scene = new Scene({
   width: config.scene.width,
   height: config.scene.height,
@@ -12,8 +11,8 @@ const scene = new Scene({
 
 scene.addItem(new Polygon({
   color: 'red',
-  speed: 5,
-  direction: 0,
+  speed: 3,
+  direction: 30,
   x: 0,
   y: 15,
   vertices: [
@@ -26,8 +25,8 @@ scene.addItem(new Polygon({
 
 scene.addItem(new Circle({
   color: 'blue',
-  speed: 30,
-  direction: 0,
+  speed: 1,
+  direction: 70,
   x: 0,
   y: 200,
   radius: 40

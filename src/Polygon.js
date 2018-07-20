@@ -82,39 +82,44 @@ export default class Polygon {
   move() {
     if (this.speed < 0 || this.direction === null) return
     /** @type {Coordinates} Новые координаты */
-    let newС = [
-      this.x + this.speed * Math.cos(this.direction * (Math.PI / 180)),
-      this.y + this.speed * Math.sin(this.direction * (Math.PI / 180)),
-    ]
+    this.x += this.speed * Math.cos(this.direction * (Math.PI / 180))
+    this.y += this.speed * Math.sin(this.direction * (Math.PI / 180))
 
     /** Половина ширины */
     const w = this.width / 2
     /** Половина высоты */
     const h = this.height / 2
 
-    if (newС[0] < w) {
-      newС[0] = w
+    // Столкновение с левой границей сцены
+    if (this.leftBorder <= 0) {
+      this.x = w
       this.direction = 180 - this.direction
-    } else if (newС[0] + w > this.scene.width) {
-      newС[0] = this.scene.width - w
+    }
+    
+    // Столкновение с правой границей сцены
+    if (this.rigthBorder >= this.scene.width) {
+      this.x = this.scene.width - w
       this.direction = 180 - this.direction
     }
 
-    if (newС[1] < h) {
-      newС[1] = h
+    // Столкновение с верхней границей сцены
+    if (this.topBorder <= 0) {
+      this.y = h
       this.direction = 360 - this.direction
-    } else if (newС[1] + h > this.scene.height) {
-      newС[1] = this.scene.height - this.height / 2
+    }
+    
+    // Столкновение с нижней границей сцены
+    if (this.bottomBorder > this.scene.height) {
+      this.y = this.scene.height - h
       this.direction = 360 - this.direction
     }
 
+    // Сохраняем координаты для отрисовки пройденного пути
     if (TRACK_LENGTH > 0) {
       this.track.unshift([this.x, this.y])
       this.track.splice(TRACK_LENGTH, this.track.length)
     }
 
-    this.x = newС[0]
-    this.y = newС[1]
     this.render()
     return this
   }
