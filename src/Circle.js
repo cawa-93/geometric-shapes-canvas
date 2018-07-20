@@ -1,5 +1,9 @@
 import Polygon from "./Polygon.js";
 
+/**
+ * @class
+ * @extends Polygon
+ */
 export default class Circle extends Polygon {
   constructor ({radius, ...params}) {
     super(params)

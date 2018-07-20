@@ -1,31 +1,25 @@
-import Polygon from './Polygon.js';
-import Circle from './Circle.js';
+import Polygon from "./Polygon.js";  // import for types definition
+import Circle from "./Circle.js";    // import for types definition
 
 export default class Factory {
-  constructor (scene) {
-    this.scene = scene,
+  constructor () {
+    /** @type {(Polygon | Circle)[]} Массив объектов на сцене*/
     this.items = []
   }
 
-  addItem(params) {
-    let item = null
-    params.scene = this.scene
-    switch (params.type) {
-      case 'polygon':
-        item = new Polygon(params)
-        break
-
-      case 'circle':
-        item = new Circle(params)
-        break
-    }
-
-    if (item) {
-      item.render()
-      return this.items.push(item) - 1
-    }
+  /**
+   * Добавляет объект на сцену
+   * @param {(Polygon | Circle)} params параметры нового объекта
+   */
+  addItem(item) {
+    item.render()
+    return this.items.push(item) - 1
   }
 
+  /**
+   * Удаляет объект из сцены
+   * @param {number} index Индекс требуемого объекта
+   */
   removeItem(index) {
     this.items.splice(index, 1)
   }

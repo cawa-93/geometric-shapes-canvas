@@ -1,64 +1,87 @@
 import { SHOW_OUTLINES, TRACK_LENGTH } from './config.js'
+import Scene from './Scene.js' // import for type definition
+/** 
+ * @typedef Coordinates
+ * @type {[number, number]}
+ */
 
 /**
  * Базовый многоугольник
  * @class 
- * @export Polygon
  */
 export default class Polygon {
   /**
-   * @param {{ scene: HTMLCanvasElement, color: string, speed: number, direction: number, x: number, y: number, vertices: number[] }} 
+   * @param {{ scene: Scene, color: string, speed: number, direction: number, x: number, y: number, vertices: Coordinates[] }}
    */
   constructor({ scene, color, speed, direction, x, y, vertices }) {
-    /** @property {Element} scene елемент Canvas */
-    this.scene = scene
-    this.speed = speed
-    this.direction = direction
-    this.color = color
-    this.x = x
-    this.y = y
-    this.deltaVertices = vertices
 
+    /** @type {Scene} Scene */
+    this.scene = scene
+    /** @type {number} speed */
+    this.speed = speed
+    /** @type {number} */
+    this.direction = direction
+    /** @type {number} */
+    this.color = color
+    /** @type {number} */
+    this.x = x
+    /** @type {number} */
+    this.y = y
+    /** @type {Coordinates[]} */
+    this.deltaVertices = vertices
+    
+    /** @type {Coordinates[]} */
     this.track = []
   }
 
-
+  /** Ширина полигона */
   get width() {
     const arrayOfX = this.deltaVertices.map(c => c[0])
     return Math.max(...arrayOfX) - Math.min(...arrayOfX)
   }
-
+  
+  /** Высота полигона */
   get height() {
     const arrayOfY = this.deltaVertices.map(c => c[1])
     return Math.max(...arrayOfY) - Math.min(...arrayOfY)
   }
-
+  
+  /** Верхняя граница полигона */
   get topBorder() {
     return this.y - this.height / 2
   }
-
+  
+  /** Правая граница полигона */
   get rigthBorder() {
     return this.x + this.width / 2
   }
-
+  
+  /** Нижняя граница полигона */
   get bottomBorder() {
     return this.y + this.height / 2
   }
-
+  
+  /** Левая граница полигона */
   get leftBorder() {
     return this.x - this.width / 2
   }
-
+  
+  /** 
+   * Координаты вершин многоугольника
+   * @returns {Coordinates[]}
+   */
   get vertices() {
     const w = this.width / 2
     const h = this.height / 2
     return this.deltaVertices.map(c => [c[0] + this.x - w, c[1] + this.y - h])
   }
 
-
+  /**
+   * Перемещает многоугольник в соответствии с текущим направлением и скоростью
+   */
   move() {
     if (this.speed < 0 || this.direction === null) return
-    /** @type {[number, number]} Новые координаты */
+    /** @type {Coordinates} Новые координаты */
     let newС = [
       this.x + this.speed * Math.cos(this.direction * (Math.PI / 180)),
       this.y + this.speed * Math.sin(this.direction * (Math.PI / 180)),
@@ -96,6 +119,7 @@ export default class Polygon {
     return this
   }
 
+  /** Рисует границы */
   renderOutline() {
     const outline = new Path2D()
     outline.rect(
@@ -117,6 +141,7 @@ export default class Polygon {
     return this
   }
 
+  /** Рисует след */
   renderTrack() {
     const track = new Path2D()
     track.moveTo(this.x, this.y)
@@ -125,6 +150,7 @@ export default class Polygon {
     return this
   }
 
+  /** Рисует многоугольник */
   renderPolygon() {
     const polygon = new Path2D()
     const vertices = this.vertices
@@ -139,7 +165,7 @@ export default class Polygon {
   }
 
   /**
-   * Рисует контур
+   * Рисует многоугольник, границы и след
    */
   render() {
     
