@@ -19,7 +19,11 @@ export default class Polygon {
     this.scene = scene
     /** @type {number} speed */
     this.speed = speed
-    /** @type {number} */
+    /** 
+     * @type {number} 
+     * @private
+     * */
+    this._direction = 0
     this.direction = direction
     /** @type {number} */
     this.color = color
@@ -65,6 +69,20 @@ export default class Polygon {
   get leftBorder() {
     return this.x - this.width / 2
   }
+
+  /** Направление движения */
+  get direction () {
+    return this._direction
+  }
+
+  set direction (value) {
+    if (value < 0) this._direction = 360 + value
+    else if (value > 360) {
+      this._direction = value % 360
+    } else {
+      this._direction = value
+    }
+  }
   
   /** 
    * Координаты вершин многоугольника
@@ -76,14 +94,27 @@ export default class Polygon {
     return this.deltaVertices.map(c => [c[0] + this.x - w, c[1] + this.y - h])
   }
 
+  /** Контур объекта */
+  get path () {
+    const path = new Path2D()
+    const vertices = this.vertices
+    path.moveTo(...vertices[0])
+    for (let i = vertices.length - 1; i >= 0; i--) {
+      path.lineTo(...vertices[i])
+    }
+
+    return path
+  }
+
   /**
    * Перемещает многоугольник в соответствии с текущим направлением и скоростью
    */
   move() {
     if (this.speed < 0 || this.direction === null) return
-    /** @type {Coordinates} Новые координаты */
-    this.x += this.speed * Math.cos(this.direction * (Math.PI / 180))
-    this.y += this.speed * Math.sin(this.direction * (Math.PI / 180))
+    const horizontalSpeed = this.speed * Math.cos(this.direction * (Math.PI / 180))
+    const verticalSpeed = this.speed * Math.sin(this.direction * (Math.PI / 180))
+    this.x += horizontalSpeed
+    this.y += verticalSpeed
 
     /** Половина ширины */
     const w = this.width / 2
@@ -114,6 +145,51 @@ export default class Polygon {
       this.direction = 360 - this.direction
     }
 
+    // Столкновение с другом объектом
+    this.scene.factory.items.forEach(target => {
+
+      if (target === this) {
+        return
+      }
+      
+      /** */
+      let touchPoint = this.hasTouchPoint(target)
+
+      // Пропускаем если нет точек соприкосновения
+      if (!touchPoint) {
+        return
+      }
+      
+      // Смещаем в обратном направлении пока остаются точки соприкосновения
+      while (touchPoint) {
+        this.x -= horizontalSpeed / 2
+        this.y -= verticalSpeed / 2
+        touchPoint = this.hasTouchPoint(target)
+      }
+
+      /** Коофициент соотношения скоростей */
+      const coof = 1 / (this.speed + target.speed)
+
+      // Изменяем направления при столкновении
+      if (this.speed > 0 && target.speed > 0) {
+        this.direction = (this.direction + target.direction) / (coof * this.speed)
+        target.direction = (this.direction + target.direction) / (coof * target.speed)
+      } else if (this.speed === 0) {
+        this.direction = target.direction
+      } else {
+        target.direction = this.direction
+      }
+
+      // Изменяем скорость при столкновении
+      if (this.speed > target.speed) {
+        this.speed--
+        target.speed++
+      } else if (this.speed != target.speed) {
+        this.speed++
+        target.speed--
+      }
+    });
+
     // Сохраняем координаты для отрисовки пройденного пути
     if (TRACK_LENGTH > 0) {
       this.track.unshift([this.x, this.y])
@@ -122,6 +198,22 @@ export default class Polygon {
 
     this.render()
     return this
+  }
+
+  /**
+   * Проверяет есть ли точки соприкосновения
+   * @param {Polygon | Circle} target 
+   */
+  hasTouchPoint(target) {
+    for (let i = 0; i < this.vertices.length; i++) {
+      const c = this.vertices[i];
+      const target_path = target.path
+      if (this.scene.ctx.isPointInPath(target_path, c[0], c[1])) {
+        return true
+      }
+    }
+
+    return false
   }
 
   /** Рисует границы */
@@ -157,15 +249,8 @@ export default class Polygon {
 
   /** Рисует многоугольник */
   renderPolygon() {
-    const polygon = new Path2D()
-    const vertices = this.vertices
-    polygon.moveTo(...vertices[0])
-    for (let i = vertices.length - 1; i >= 0; i--) {
-      polygon.lineTo(...vertices[i])
-    }
-    
     this.scene.ctx.fillStyle = this.color
-    this.scene.ctx.fill(polygon)
+    this.scene.ctx.fill(this.path)
     return this
   }
 

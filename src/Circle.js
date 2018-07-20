@@ -18,14 +18,21 @@ export default class Circle extends Polygon {
     return this.radius * 2
   }
 
-  renderPolygon() {
-    const polygon = new Path2D()
-    polygon.moveTo(this.x, this.y)
-    polygon.arc(this.x, this.y, this.radius, 0, 2*Math.PI)
-    
-    this.scene.ctx.fillStyle = this.color
-    this.scene.ctx.fill(polygon)
+  get path () {
+    const path = new Path2D()
+    path.moveTo(this.x, this.y)
+    path.arc(this.x, this.y, this.radius, 0, 2*Math.PI)
 
-    return this
+    return path
+  }
+
+  /**
+   * @param {Polygon | Circle} target 
+   */
+  hasTouchPoint(target) {
+    if (target instanceof Circle) {
+      return this.radius + target.radius > Math.sqrt(Math.pow(this.x - target.x, 2) + Math.pow(this.y - target.y, 2))
+    }
+    return target.hasTouchPoint(this)
   }
 }
