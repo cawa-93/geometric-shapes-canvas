@@ -1,6 +1,6 @@
 export default {
   scene: {
-    width: 1000,
+    width: 500,
     height: 300
   }
 }

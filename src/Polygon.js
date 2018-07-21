@@ -89,9 +89,7 @@ export default class Polygon {
    * @returns {Coordinates[]}
    */
   get vertices() {
-    const w = this.width / 2
-    const h = this.height / 2
-    return this.deltaVertices.map(c => [c[0] + this.x - w, c[1] + this.y - h])
+    return this.deltaVertices.map(c => [c[0] + this.x, c[1] + this.y])
   }
 
   /** Контур объекта */
@@ -159,6 +157,7 @@ export default class Polygon {
       if (!touchPoint) {
         return
       }
+
       
       // Смещаем в обратном направлении пока остаются точки соприкосновения
       while (touchPoint) {
@@ -166,10 +165,10 @@ export default class Polygon {
         this.y -= verticalSpeed / 2
         touchPoint = this.hasTouchPoint(target)
       }
-
+      
       /** Коофициент соотношения скоростей */
       const coof = 1 / (this.speed + target.speed)
-
+      
       // Изменяем направления при столкновении
       if (this.speed > 0 && target.speed > 0) {
         this.direction = (this.direction + target.direction) / (coof * this.speed)
@@ -205,10 +204,11 @@ export default class Polygon {
    * @param {Polygon | Circle} target 
    */
   hasTouchPoint(target) {
-    for (let i = 0; i < this.vertices.length; i++) {
-      const c = this.vertices[i];
-      const target_path = target.path
-      if (this.scene.ctx.isPointInPath(target_path, c[0], c[1])) {
+    const target_path = target.path
+    const vertices = this.vertices;
+    for (let i = 0; i < vertices.length; i++) {
+      const point = vertices[i];
+      if (this.scene.ctx.isPointInPath(target_path, ...point, 'evenodd')) {
         return true
       }
     }
