@@ -1,11 +1,8 @@
 import Factory from "./Factory.js";
-import Polygon from "./Polygon.js";  // import for types definition
-import Circle from "./Circle.js";    // import for types definition
 
 /**
  * Сцена
  * @class
- * @export Scene
  */
 export default class Scene {
   /**
@@ -36,7 +33,7 @@ export default class Scene {
 
   /**
    * Добавляет новый елемент на сцену
-   * @param {(Polygon | Circle)} item 
+   * @param {(import("./Polygon").default | import("./Circle").default | import("./Let").default)} item
    */
   addItem(item) {
     item.scene = this

@@ -1,9 +1,9 @@
 export default {
   scene: {
-    width: 500,
-    height: 300
+    width: 800,
+    height: 800
   }
 }
 
-export const SHOW_OUTLINES = true
-export const TRACK_LENGTH = 10
+export const SHOW_OUTLINES = !true
+export const TRACK_LENGTH = 0

@@ -1,5 +1,4 @@
 import { SHOW_OUTLINES, TRACK_LENGTH } from './config.js'
-import Scene from './Scene.js' // import for type definition
 /** 
  * @typedef Coordinates
  * @type {[number, number]}
@@ -11,11 +10,11 @@ import Scene from './Scene.js' // import for type definition
  */
 export default class Polygon {
   /**
-   * @param {{ scene: Scene, color: string, speed: number, direction: number, x: number, y: number, vertices: Coordinates[] }}
+   * @param {{ scene: import("./Scene").default, color: string, speed: number, direction: number, x: number, y: number, vertices: Coordinates[] }}
    */
   constructor({ scene, color, speed, direction, x, y, vertices }) {
 
-    /** @type {Scene} Scene */
+    /** @type {import("./Scene").default} Scene */
     this.scene = scene
     /** @type {number} speed */
     this.speed = speed
@@ -23,8 +22,7 @@ export default class Polygon {
      * @type {number} 
      * @private
      * */
-    this._direction = 0
-    this.direction = direction
+    this._direction = direction
     /** @type {number} */
     this.color = color
     /** @type {number} */
@@ -32,7 +30,7 @@ export default class Polygon {
     /** @type {number} */
     this.y = y
     /** @type {Coordinates[]} */
-    this.deltaVertices = vertices
+    this.deltaVertices = vertices || []
     
     /** @type {Coordinates[]} */
     this.track = []
@@ -40,34 +38,32 @@ export default class Polygon {
 
   /** Ширина полигона */
   get width() {
-    const arrayOfX = this.deltaVertices.map(c => c[0])
-    return Math.max(...arrayOfX) - Math.min(...arrayOfX)
+    return this.rigthBorder - this.leftBorder
   }
   
   /** Высота полигона */
   get height() {
-    const arrayOfY = this.deltaVertices.map(c => c[1])
-    return Math.max(...arrayOfY) - Math.min(...arrayOfY)
+    return this.bottomBorder - this.topBorder
   }
   
   /** Верхняя граница полигона */
   get topBorder() {
-    return this.y - this.height / 2
+    return Math.min(...this.vertices.map(c => c[1]))
   }
   
   /** Правая граница полигона */
   get rigthBorder() {
-    return this.x + this.width / 2
+    return Math.max(...this.vertices.map(c => c[0]))
   }
   
   /** Нижняя граница полигона */
   get bottomBorder() {
-    return this.y + this.height / 2
+    return Math.max(...this.vertices.map(c => c[1]))
   }
   
   /** Левая граница полигона */
   get leftBorder() {
-    return this.x - this.width / 2
+    return Math.min(...this.vertices.map(c => c[0]))
   }
 
   /** Направление движения */
@@ -89,7 +85,12 @@ export default class Polygon {
    * @returns {Coordinates[]}
    */
   get vertices() {
-    return this.deltaVertices.map(c => [c[0] + this.x, c[1] + this.y])
+    return this.deltaVertices.map(c => {
+      return [
+        c[0] + this.x,
+        c[1] + this.y
+      ]
+    })
   }
 
   /** Контур объекта */
@@ -108,38 +109,36 @@ export default class Polygon {
    * Перемещает многоугольник в соответствии с текущим направлением и скоростью
    */
   move() {
-    if (this.speed < 0 || this.direction === null) return
+    if (this.speed < 0 || this.direction === null) {
+      this.render()
+      return this
+    }
     const horizontalSpeed = this.speed * Math.cos(this.direction * (Math.PI / 180))
     const verticalSpeed = this.speed * Math.sin(this.direction * (Math.PI / 180))
     this.x += horizontalSpeed
     this.y += verticalSpeed
 
-    /** Половина ширины */
-    const w = this.width / 2
-    /** Половина высоты */
-    const h = this.height / 2
-
     // Столкновение с левой границей сцены
     if (this.leftBorder <= 0) {
-      this.x = w
+      this.x = this.x-this.leftBorder
       this.direction = 180 - this.direction
     }
     
     // Столкновение с правой границей сцены
     if (this.rigthBorder >= this.scene.width) {
-      this.x = this.scene.width - w
+      this.x = this.scene.width - (this.rigthBorder - this.x)
       this.direction = 180 - this.direction
     }
 
     // Столкновение с верхней границей сцены
     if (this.topBorder <= 0) {
-      this.y = h
+      this.y = this.y - this.topBorder
       this.direction = 360 - this.direction
     }
     
     // Столкновение с нижней границей сцены
-    if (this.bottomBorder > this.scene.height) {
-      this.y = this.scene.height - h
+    if (this.bottomBorder >= this.scene.height) {
+      this.y = this.scene.height - (this.bottomBorder - this.y)
       this.direction = 360 - this.direction
     }
 
@@ -150,7 +149,7 @@ export default class Polygon {
         return
       }
       
-      /** */
+    //   /** */
       let touchPoint = this.hasTouchPoint(target)
 
       // Пропускаем если нет точек соприкосновения
@@ -165,28 +164,54 @@ export default class Polygon {
         this.y -= verticalSpeed / 2
         touchPoint = this.hasTouchPoint(target)
       }
-      
-      /** Коофициент соотношения скоростей */
-      const coof = 1 / (this.speed + target.speed)
-      
-      // Изменяем направления при столкновении
-      if (this.speed > 0 && target.speed > 0) {
-        this.direction = (this.direction + target.direction) / (coof * this.speed)
-        target.direction = (this.direction + target.direction) / (coof * target.speed)
-      } else if (this.speed === 0) {
-        this.direction = target.direction
-      } else {
-        target.direction = this.direction
+
+      // this.x = target.leftBorder
+      // this.x - (this.rigthBorder - this.x)
+
+      const oldDirection = this.direction
+
+      if (this.x < target.leftBorder) {
+        this.direction = 180 - this.direction
       }
 
-      // Изменяем скорость при столкновении
-      if (this.speed > target.speed) {
-        this.speed--
-        target.speed++
-      } else if (this.speed != target.speed) {
-        this.speed++
-        target.speed--
+      if (this.x > target.rigthBorder) {
+        this.direction = 180 - this.direction
       }
+
+      if (this.y < target.topBorder) {
+        this.direction = 360 - this.direction
+      }
+
+      if (this.y > target.bottomBorder) {
+        this.direction = 360 - this.direction
+      }
+
+      if (oldDirection === this.direction) {
+        this.direction += 180
+      }
+      
+    //   /** Коофициент соотношения скоростей */
+    //   const coof = 1 / (this.speed + target.speed)
+      
+    //   // Изменяем направления при столкновении
+    //   // this.direction = (90 + this.direction) / 2
+    //   // if (this.speed > 0 && target.speed > 0) {
+    //   //   this.direction = (this.direction + target.direction) / (coof * this.speed)
+    //   //   target.direction = (this.direction + target.direction) / (coof * target.speed)
+    //   // } else if (this.speed === 0) {
+    //   //   this.direction = target.direction
+    //   // } else {
+    //   //   target.direction = this.direction
+    //   // }
+
+    //   // Изменяем скорость при столкновении
+    //   // if (this.speed > target.speed) {
+    //   //   this.speed--
+    //   //   target.speed++
+    //   // } else if (this.speed != target.speed) {
+    //   //   this.speed++
+    //   //   target.speed--
+    //   // }
     });
 
     // Сохраняем координаты для отрисовки пройденного пути
@@ -201,9 +226,13 @@ export default class Polygon {
 
   /**
    * Проверяет есть ли точки соприкосновения
-   * @param {Polygon | Circle} target 
+   * @param {(Polygon | import("./Circle").default | import("./Let").default)} target
+   * @returns {boolean}
    */
   hasTouchPoint(target) {
+    if (target.constructor.name === 'Let') {
+      return target.hasTouchPoint(this)
+    }
     const target_path = target.path
     const vertices = this.vertices;
     for (let i = 0; i < vertices.length; i++) {
@@ -220,8 +249,8 @@ export default class Polygon {
   renderOutline() {
     const outline = new Path2D()
     outline.rect(
-      this.x - this.width / 2,
-      this.y - this.height / 2,
+      this.leftBorder,
+      this.topBorder,
       this.width,
       this.height
     )

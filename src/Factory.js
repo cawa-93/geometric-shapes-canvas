@@ -1,15 +1,17 @@
-import Polygon from "./Polygon.js";  // import for types definition
-import Circle from "./Circle.js";    // import for types definition
+/**
+ * @typedef Figure
+ * @type {(import("./Polygon").default | import("./Circle").default | import("./Let").default)}
+ */
 
 export default class Factory {
   constructor () {
-    /** @type {(Polygon | Circle)[]} Массив объектов на сцене*/
+    /** @type {Figure[]} Массив объектов на сцене*/
     this.items = []
   }
 
   /**
    * Добавляет объект на сцену
-   * @param {(Polygon | Circle)} params параметры нового объекта
+   * @param {Figure} item параметры нового объекта
    */
   addItem(item) {
     item.render()
@@ -24,3 +26,5 @@ export default class Factory {
     this.items.splice(index, 1)
   }
 }
+
+
