@@ -204,14 +204,16 @@ export default class Polygon {
     //   //   target.direction = this.direction
     //   // }
 
-    //   // Изменяем скорость при столкновении
-    //   // if (this.speed > target.speed) {
-    //   //   this.speed--
-    //   //   target.speed++
-    //   // } else if (this.speed != target.speed) {
-    //   //   this.speed++
-    //   //   target.speed--
-    //   // }
+      // Изменяем скорость при столкновении
+      if (target.constructor.name !== 'Let') {
+        if (this.speed > target.speed) {
+          this.speed--
+          target.speed++
+        } else if (this.speed != target.speed) {
+          this.speed++
+          target.speed--
+        }
+      }
     });
 
     // Сохраняем координаты для отрисовки пройденного пути
