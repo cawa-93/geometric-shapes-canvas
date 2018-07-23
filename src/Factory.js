@@ -1,11 +1,21 @@
+/** @module Factory */
+
 /**
  * @typedef Figure
  * @type {(import("./Polygon").default | import("./Circle").default | import("./Let").default)}
  */
 
+ /**
+  * @class Фабрика объектов
+  * Хранит в себе массив объектов, может добавлять и удалять объекты со сцены
+  * @alias module:Factory
+  */
 export default class Factory {
   constructor () {
-    /** @type {Figure[]} Массив объектов на сцене*/
+    /** 
+     * Массив объектов на сцене 
+     * @type {Figure[]}
+     */
     this.items = []
   }
 

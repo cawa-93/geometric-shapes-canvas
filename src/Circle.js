@@ -1,3 +1,4 @@
+/** @module Circle */
 import Polygon from "./Polygon.js";
 /** 
  * @typedef Coordinates
@@ -5,8 +6,10 @@ import Polygon from "./Polygon.js";
  */
 
 /**
+ * Круг
  * @class
  * @extends Polygon
+ * @alias module:Circle
  */
 export default class Circle extends Polygon {
   constructor ({radius, ...params}) {

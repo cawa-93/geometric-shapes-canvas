@@ -1,5 +1,11 @@
+/** @module Let */
 import Circle from './Circle.js'
 
+/**
+ * Препятствие
+ * @class
+ * @alias module:Let
+ */
 export default class Let extends Circle {
   constructor (params) {
     params.radius = 10
@@ -8,7 +14,10 @@ export default class Let extends Circle {
     super(params)
   }
 
-  /** @type {null} */
+  /** 
+   * @type {null} 
+   * @readonly
+   */
   get direction () {
     return null
   }

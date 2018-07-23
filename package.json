@@ -4,7 +4,8 @@
   "description": "q-task",
   "main": "index.js",
   "scripts": {
-    "start": "node ./server.js"
+    "start": "node ./server.js",
+    "doc": "jsdoc -c ./jsdoc.conf.json -d doc"
   },
   "repository": {
     "type": "git",
@@ -20,5 +21,9 @@
   "dependencies": {
     "connect": "^3.6.6",
     "serve-static": "^1.13.2"
+  },
+  "devDependencies": {
+    "jsdoc": "^3.5.5",
+    "jsdoc-export-default-interop": "^0.3.1"
   }
 }

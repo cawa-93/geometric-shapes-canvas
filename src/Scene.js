@@ -1,8 +1,11 @@
+/** @module Scene */
+
 import Factory from "./Factory.js";
 
 /**
  * Сцена
  * @class
+ * @alias module:Scene
  */
 export default class Scene {
   /**

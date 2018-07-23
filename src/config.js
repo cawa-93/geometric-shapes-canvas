@@ -1,3 +1,4 @@
+/** @module config */
 export default {
   scene: {
     width: 800,
